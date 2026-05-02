@@ -207,7 +207,7 @@ const Index = () => {
 
         {/* Tile sections */}
         <section className="space-y-10" aria-label="Quick links">
-          {CATEGORIES.map((cat) => (
+          {visibleCategories.map((cat) => (
             <div key={cat}>
               <h2 className="mb-4 px-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 {cat}
