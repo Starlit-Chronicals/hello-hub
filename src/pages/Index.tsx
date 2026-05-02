@@ -149,6 +149,35 @@ const Index = () => {
           <p className="mt-3 max-w-md text-base text-muted-foreground md:text-lg">
             Your soft little corner of the internet — everything for school in one place.
           </p>
+
+          {/* School Mode toggle */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={schoolMode}
+            onClick={() => setSchoolMode((v) => !v)}
+            className="glass mt-6 flex items-center gap-3 rounded-full border border-white/70 px-4 py-2 shadow-[var(--shadow-soft)] transition-transform hover:scale-105 active:scale-95"
+          >
+            <span className="text-sm font-semibold text-foreground/80">
+              📚 School Mode
+            </span>
+            <span
+              className={`relative h-6 w-11 rounded-full transition-colors ${
+                schoolMode
+                  ? "bg-[hsl(var(--pastel-mint))]"
+                  : "bg-[hsl(var(--pastel-pink))]"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  schoolMode ? "translate-x-5" : "translate-x-0.5"
+                }`}
+              />
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {schoolMode ? "On — distractions hidden" : "Off — all tiles shown"}
+            </span>
+          </button>
         </header>
 
         {/* Search */}
