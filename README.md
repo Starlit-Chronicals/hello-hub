@@ -1,5 +1,3 @@
-# Welcome to your Lovable project
+# Hello! Starlight Here. i would like to say this is open Source, and was made using AI. i do not coppyright this, but if i find MY WORK (INCLUDING MY PFP) coppyrighted i WILL sue. this pfp was made by my girlfriend it took 3 days.
 
-I need to add and the non school mode add pintrest and that lot and more links. ALSO NO CHATGPT WHENON SCHOOL also add copilot and Loveable on the at home section also remove "Sunshine" it is weird also set it so you can change the colours and add more neesary stuff for a browser.
-
-Also this was made using AI, i Starlight CHronicals IS NOT RESPONSABLE if it gets hacked and redirects to NSFW in a update.
+enough about that. This is a Homepage to replage google, it is work in progress
