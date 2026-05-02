@@ -75,11 +75,24 @@ const colorMap: Record<string, string> = {
 const Index = () => {
   const [time, setTime] = useState(new Date());
   const [query, setQuery] = useState("");
+  const [schoolMode, setSchoolMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const stored = window.localStorage.getItem("bloom-school-mode");
+    return stored === null ? true : stored === "true";
+  });
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000 * 30);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("bloom-school-mode", String(schoolMode));
+  }, [schoolMode]);
+
+  const visibleCategories = schoolMode
+    ? CATEGORIES.filter((c) => c !== "Social")
+    : CATEGORIES;
 
   const greeting = useMemo(() => {
     const h = time.getHours();
