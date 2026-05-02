@@ -1,0 +1,13 @@
+Adding in the Non school profile mode, PINTREST.
+No chatgpt while in SChool mode
+Copilot in At home mode
+Removing "Sunshine" at the end, so it only says good morning,
+Adding ability to change the dark mode colours
+Adding more NEsserary Browser Shit
+When you open chrome aflter being last in "At home" or "limited" mode it stays,
+Adding Github redirect, 
+Also adding Github link to this progect
+adding sites, makign boxes smaller so you dont have to scroll 100 years 
+Ability to add own links
+Adding Time being pulled from laptop/pc HOPEFULLY or sothing like it what will show YOUR REGIONS TIME
+Adding a USERSET Passkey when swapping from limited to at home or, in school to at hme
