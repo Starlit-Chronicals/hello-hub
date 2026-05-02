@@ -59,6 +59,54 @@
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  .dark {
+    /* Dark pastel — soft, easy on eyes at night */
+    --background: 250 30% 10%;
+    --foreground: 280 30% 92%;
+
+    --card: 250 25% 14%;
+    --card-foreground: 280 30% 92%;
+
+    --popover: 250 25% 14%;
+    --popover-foreground: 280 30% 92%;
+
+    --primary: 280 50% 70%;
+    --primary-foreground: 280 40% 12%;
+
+    --secondary: 200 35% 25%;
+    --secondary-foreground: 200 50% 92%;
+
+    --muted: 250 20% 20%;
+    --muted-foreground: 280 15% 70%;
+
+    --accent: 340 40% 30%;
+    --accent-foreground: 340 50% 92%;
+
+    --destructive: 0 50% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 250 20% 22%;
+    --input: 250 20% 22%;
+    --ring: 280 50% 70%;
+
+    /* Muted pastel palette for dark mode */
+    --pastel-pink: 340 45% 55%;
+    --pastel-peach: 25 50% 55%;
+    --pastel-yellow: 50 50% 55%;
+    --pastel-mint: 150 35% 45%;
+    --pastel-sky: 200 45% 50%;
+    --pastel-lavender: 270 40% 55%;
+    --pastel-rose: 350 45% 55%;
+    --pastel-lilac: 290 40% 55%;
+
+    --gradient-bg: linear-gradient(135deg, hsl(250 35% 8%) 0%, hsl(270 30% 12%) 50%, hsl(290 30% 10%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(250 25% 18% / 0.7), hsl(250 25% 14% / 0.5));
+
+    --shadow-soft: 0 8px 32px -8px hsl(280 60% 5% / 0.5);
+    --shadow-glow: 0 12px 40px -12px hsl(280 70% 50% / 0.35);
+    --shadow-card: 0 4px 20px -4px hsl(280 60% 5% / 0.4);
+  }
 }
 
 @layer base {

@@ -13,20 +13,25 @@ import {
   FileSpreadsheet,
   Presentation,
   BookOpen,
-  GraduationCap,
   Globe,
   Music,
   Image as ImageIcon,
   Cloud,
   Sparkles,
+  Calculator,
+  Sun,
+  Moon,
 } from "lucide-react";
+
+type Mode = "school" | "strict" | "home";
 
 type Tile = {
   name: string;
   url: string;
   Icon: React.ComponentType<{ className?: string }>;
-  color: string; // pastel token name
+  color: string;
   category: "Microsoft" | "Google" | "Social" | "Study";
+  tags?: Array<"ai" | "video" | "social">;
 };
 
 const TILES: Tile[] = [
@@ -42,21 +47,21 @@ const TILES: Tile[] = [
   // Google
   { name: "Gmail", url: "https://mail.google.com", Icon: Mail, color: "rose", category: "Google" },
   { name: "Drive", url: "https://drive.google.com", Icon: HardDrive, color: "yellow", category: "Google" },
-  { name: "Classroom", url: "https://classroom.google.com", Icon: GraduationCap, color: "mint", category: "Google" },
+  { name: "Classroom", url: "https://classroom.google.com", Icon: BookOpen, color: "mint", category: "Google" },
   { name: "Calendar", url: "https://calendar.google.com", Icon: Calendar, color: "pink", category: "Google" },
   { name: "Docs", url: "https://docs.google.com", Icon: FileText, color: "sky", category: "Google" },
 
   // Social
-  { name: "YouTube", url: "https://www.youtube.com", Icon: Youtube, color: "rose", category: "Social" },
-  { name: "Discord", url: "https://discord.com/app", Icon: MessageCircle, color: "lavender", category: "Social" },
-  { name: "Spotify", url: "https://open.spotify.com", Icon: Music, color: "mint", category: "Social" },
-  { name: "Pinterest", url: "https://www.pinterest.com", Icon: ImageIcon, color: "pink", category: "Social" },
+  { name: "YouTube", url: "https://www.youtube.com", Icon: Youtube, color: "rose", category: "Social", tags: ["video", "social"] },
+  { name: "Discord", url: "https://discord.com/app", Icon: MessageCircle, color: "lavender", category: "Social", tags: ["social"] },
+  { name: "Spotify", url: "https://open.spotify.com", Icon: Music, color: "mint", category: "Social", tags: ["social"] },
+  { name: "Pinterest", url: "https://www.pinterest.com", Icon: ImageIcon, color: "pink", category: "Social", tags: ["social"] },
 
   // Study
   { name: "Quizlet", url: "https://quizlet.com", Icon: BookOpen, color: "peach", category: "Study" },
-  { name: "Khan Academy", url: "https://www.khanacademy.org", Icon: GraduationCap, color: "yellow", category: "Study" },
+  { name: "Desmos", url: "https://www.desmos.com/calculator", Icon: Calculator, color: "yellow", category: "Study" },
   { name: "Wikipedia", url: "https://www.wikipedia.org", Icon: Globe, color: "lilac", category: "Study" },
-  { name: "ChatGPT", url: "https://chat.openai.com", Icon: Sparkles, color: "pink", category: "Study" },
+  { name: "ChatGPT", url: "https://chat.openai.com", Icon: Sparkles, color: "pink", category: "Study", tags: ["ai"] },
 ];
 
 const CATEGORIES: Array<Tile["category"]> = ["Microsoft", "Google", "Study", "Social"];
@@ -72,13 +77,28 @@ const colorMap: Record<string, string> = {
   lilac: "bg-[hsl(var(--pastel-lilac))]",
 };
 
+const MODE_LABELS: Record<Mode, { emoji: string; label: string; hint: string }> = {
+  school: { emoji: "📚", label: "At School", hint: "Hides social — keeps study tools" },
+  strict: { emoji: "🔒", label: "Strict", hint: "Hides AI, video & social" },
+  home: { emoji: "🌷", label: "At Home", hint: "Everything visible" },
+};
+
 const Index = () => {
   const [time, setTime] = useState(new Date());
   const [query, setQuery] = useState("");
-  const [schoolMode, setSchoolMode] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    const stored = window.localStorage.getItem("bloom-school-mode");
-    return stored === null ? true : stored === "true";
+
+  const [mode, setMode] = useState<Mode>(() => {
+    if (typeof window === "undefined") return "school";
+    const stored = window.localStorage.getItem("bloom-mode");
+    if (stored === "school" || stored === "strict" || stored === "home") return stored;
+    return "school";
+  });
+
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const stored = window.localStorage.getItem("bloom-dark");
+    if (stored !== null) return stored === "true";
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   });
 
   useEffect(() => {
@@ -87,12 +107,22 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("bloom-school-mode", String(schoolMode));
-  }, [schoolMode]);
+    window.localStorage.setItem("bloom-mode", mode);
+  }, [mode]);
 
-  const visibleCategories = schoolMode
-    ? CATEGORIES.filter((c) => c !== "Social")
-    : CATEGORIES;
+  useEffect(() => {
+    window.localStorage.setItem("bloom-dark", String(dark));
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
+
+  const visibleTiles = useMemo(() => {
+    return TILES.filter((t) => {
+      if (mode === "home") return true;
+      if (mode === "school") return !t.tags?.includes("social");
+      // strict
+      return !t.tags?.some((tag) => tag === "social" || tag === "video" || tag === "ai");
+    });
+  }, [mode]);
 
   const greeting = useMemo(() => {
     const h = time.getHours();
@@ -104,7 +134,7 @@ const Index = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
-    if (!q) return;
+    if (!q || q.length > 500) return;
     const url = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -130,11 +160,27 @@ const Index = () => {
         <div className="absolute top-10 right-1/3 h-64 w-64 rounded-full bg-[hsl(var(--pastel-yellow))] opacity-30 blur-3xl" />
       </div>
 
+      {/* Floating dark mode toggle */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={dark}
+        aria-label="Toggle dark mode"
+        onClick={() => setDark((v) => !v)}
+        className="glass fixed right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/60 shadow-[var(--shadow-soft)] transition-transform hover:scale-110 active:scale-95"
+      >
+        {dark ? (
+          <Sun className="h-5 w-5 text-[hsl(var(--pastel-yellow))]" />
+        ) : (
+          <Moon className="h-5 w-5 text-foreground/70" />
+        )}
+      </button>
+
       <div className="relative mx-auto max-w-6xl px-6 py-10 md:py-14">
         {/* Header */}
         <header className="mb-10 flex flex-col items-center text-center">
           <div className="glass mb-6 flex items-center gap-2 rounded-full border border-white/60 px-4 py-1.5 shadow-[var(--shadow-soft)]">
-            <Sparkles className="h-4 w-4 text-primary-foreground" />
+            <Sparkles className="h-4 w-4 text-foreground/70" />
             <span className="text-sm font-medium text-foreground/80">
               {dateString} · {timeString}
             </span>
@@ -150,34 +196,35 @@ const Index = () => {
             Your soft little corner of the internet — everything for school in one place.
           </p>
 
-          {/* School Mode toggle */}
-          <button
-            type="button"
-            role="switch"
-            aria-checked={schoolMode}
-            onClick={() => setSchoolMode((v) => !v)}
-            className="glass mt-6 flex items-center gap-3 rounded-full border border-white/70 px-4 py-2 shadow-[var(--shadow-soft)] transition-transform hover:scale-105 active:scale-95"
+          {/* Mode picker */}
+          <div
+            role="radiogroup"
+            aria-label="Visibility mode"
+            className="glass mt-6 flex items-center gap-1 rounded-full border border-white/60 p-1 shadow-[var(--shadow-soft)]"
           >
-            <span className="text-sm font-semibold text-foreground/80">
-              📚 School Mode
-            </span>
-            <span
-              className={`relative h-6 w-11 rounded-full transition-colors ${
-                schoolMode
-                  ? "bg-[hsl(var(--pastel-mint))]"
-                  : "bg-[hsl(var(--pastel-pink))]"
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                  schoolMode ? "translate-x-5" : "translate-x-0.5"
-                }`}
-              />
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {schoolMode ? "On — distractions hidden" : "Off — all tiles shown"}
-            </span>
-          </button>
+            {(Object.keys(MODE_LABELS) as Mode[]).map((m) => {
+              const active = mode === m;
+              return (
+                <button
+                  key={m}
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setMode(m)}
+                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                    active
+                      ? "bg-[hsl(var(--pastel-lavender))] text-[hsl(280_50%_25%)] shadow-sm"
+                      : "text-foreground/70 hover:text-foreground"
+                  }`}
+                >
+                  <span className="mr-1">{MODE_LABELS[m].emoji}</span>
+                  {MODE_LABELS[m].label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {MODE_LABELS[mode].hint}
+          </p>
         </header>
 
         {/* Search */}
@@ -192,6 +239,7 @@ const Index = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              maxLength={500}
               placeholder="Search Google or type a URL..."
               className="w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/70"
               autoFocus
@@ -207,33 +255,37 @@ const Index = () => {
 
         {/* Tile sections */}
         <section className="space-y-10" aria-label="Quick links">
-          {visibleCategories.map((cat) => (
-            <div key={cat}>
-              <h2 className="mb-4 px-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                {cat}
-              </h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                {TILES.filter((t) => t.category === cat).map((tile) => (
-                  <a
-                    key={tile.name}
-                    href={tile.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tile-hover glass group flex flex-col items-center justify-center gap-3 rounded-3xl border border-white/70 p-5 shadow-[var(--shadow-card)]"
-                  >
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl ${colorMap[tile.color]} shadow-inner`}
+          {CATEGORIES.map((cat) => {
+            const tiles = visibleTiles.filter((t) => t.category === cat);
+            if (tiles.length === 0) return null;
+            return (
+              <div key={cat}>
+                <h2 className="mb-4 px-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                  {cat}
+                </h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {tiles.map((tile) => (
+                    <a
+                      key={tile.name}
+                      href={tile.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tile-hover glass group flex flex-col items-center justify-center gap-3 rounded-3xl border border-white/70 p-5 shadow-[var(--shadow-card)]"
                     >
-                      <tile.Icon className="h-7 w-7 text-foreground/75" />
-                    </div>
-                    <span className="text-sm font-semibold text-foreground/85">
-                      {tile.name}
-                    </span>
-                  </a>
-                ))}
+                      <div
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl ${colorMap[tile.color]} shadow-inner`}
+                      >
+                        <tile.Icon className="h-7 w-7 text-foreground/80" />
+                      </div>
+                      <span className="text-sm font-semibold text-foreground/85">
+                        {tile.name}
+                      </span>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
 
         <footer className="mt-16 text-center text-xs text-muted-foreground/80">
