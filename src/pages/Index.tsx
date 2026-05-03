@@ -463,7 +463,10 @@ const Index = () => {
         </section>
 
         <footer className="mt-12 flex flex-col items-center gap-2 text-center text-xs text-muted-foreground/80">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a href="/requests" className="inline-flex items-center gap-1 hover:text-foreground/80">
+              <Sparkles className="h-3 w-3" /> Suggest a link
+            </a>
             <a href={PROJECT_GITHUB} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-foreground/80">
               <Github className="h-3 w-3" /> Project on GitHub
             </a>
