@@ -35,9 +35,13 @@ import {
   X,
   LogIn,
   LogOut,
+  UserCircle,
 } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { z } from "zod";
 
 type Mode = "school" | "strict" | "home";
 
@@ -172,6 +176,29 @@ const Index = () => {
   // Modals
   const [showAdd, setShowAdd] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [accountBusy, setAccountBusy] = useState(false);
+
+  const updateEmail = async () => {
+    const parsed = z.string().trim().email("Enter a valid email").max(255).safeParse(newEmail);
+    if (!parsed.success) return toast.error(parsed.error.errors[0].message);
+    setAccountBusy(true);
+    const { error } = await supabase.auth.updateUser({ email: parsed.data });
+    setAccountBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Check both inboxes to confirm the change 💌");
+    setNewEmail("");
+  };
+
+  const signOutEverywhere = async () => {
+    setAccountBusy(true);
+    const { error } = await supabase.auth.signOut({ scope: "global" });
+    setAccountBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Signed out from all devices 🌙");
+    setShowAccount(false);
+  };
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [newColor, setNewColor] = useState("lavender");
@@ -328,20 +355,18 @@ const Index = () => {
       {/* Floating buttons */}
       <div className="fixed right-4 top-4 z-20 flex items-center gap-2">
         {user ? (
-          <>
-            <span className="glass hidden sm:inline-flex items-center rounded-full border border-white/60 px-3 py-1.5 text-xs font-medium text-foreground/70 shadow-[var(--shadow-soft)]">
+          <button
+            type="button"
+            onClick={() => setShowAccount(true)}
+            aria-label="Account settings"
+            title={user.email ?? "Account"}
+            className="glass flex h-11 items-center gap-1.5 rounded-full border border-white/60 px-4 shadow-[var(--shadow-soft)] transition-transform hover:scale-105 active:scale-95"
+          >
+            <UserCircle className="h-5 w-5 text-foreground/70" />
+            <span className="hidden sm:inline text-xs font-semibold text-foreground/80 max-w-[160px] truncate">
               {user.email}
             </span>
-            <button
-              type="button"
-              onClick={() => signOut()}
-              aria-label="Sign out"
-              title="Sign out"
-              className="glass flex h-11 w-11 items-center justify-center rounded-full border border-white/60 shadow-[var(--shadow-soft)] transition-transform hover:scale-110 active:scale-95"
-            >
-              <LogOut className="h-5 w-5 text-foreground/70" />
-            </button>
-          </>
+          </button>
         ) : (
           <RouterLink
             to="/auth"
@@ -622,6 +647,68 @@ const Index = () => {
             <div className="mt-5 flex justify-between">
               <button onClick={() => setAccentHue(280)} className="text-xs text-muted-foreground hover:text-foreground">Reset</button>
               <button onClick={() => setShowTheme(false)} className="rounded-full bg-[hsl(var(--pastel-lavender))] px-4 py-2 text-sm font-semibold text-[hsl(280_50%_25%)]">Done</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Account modal */}
+      {showAccount && user && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+          <div className="glass w-full max-w-md rounded-3xl border border-white/70 p-6 shadow-[var(--shadow-glow)]">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <UserCircle className="h-5 w-5" /> Account
+              </h3>
+              <button onClick={() => setShowAccount(false)} className="rounded-full p-1 hover:bg-white/40" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mb-5 rounded-2xl bg-white/40 px-4 py-3 text-sm">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Signed in as</p>
+              <p className="font-medium break-all">{user.email}</p>
+            </div>
+
+            <div className="mb-5">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Update email
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="new@email.com"
+                  maxLength={255}
+                  className="flex-1 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
+                />
+                <button
+                  onClick={updateEmail}
+                  disabled={accountBusy || !newEmail}
+                  className="rounded-2xl bg-[hsl(var(--pastel-lavender))] px-4 py-2 text-sm font-semibold text-[hsl(280_50%_25%)] disabled:opacity-50"
+                >
+                  Update
+                </button>
+              </div>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                You'll get a confirmation link at both addresses.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => { signOut(); setShowAccount(false); }}
+                className="w-full rounded-2xl border border-white/70 bg-white/40 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/60 inline-flex items-center justify-center gap-2"
+              >
+                <LogOut className="h-4 w-4" /> Sign out (this device)
+              </button>
+              <button
+                onClick={signOutEverywhere}
+                disabled={accountBusy}
+                className="w-full rounded-2xl bg-[hsl(var(--pastel-rose))] px-4 py-2.5 text-sm font-semibold text-[hsl(340_50%_25%)] transition hover:opacity-90 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              >
+                <LogOut className="h-4 w-4" /> Sign out everywhere
+              </button>
             </div>
           </div>
         </div>
