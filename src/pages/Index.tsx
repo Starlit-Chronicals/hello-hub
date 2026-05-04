@@ -327,6 +327,32 @@ const Index = () => {
 
       {/* Floating buttons */}
       <div className="fixed right-4 top-4 z-20 flex items-center gap-2">
+        {user ? (
+          <>
+            <span className="glass hidden sm:inline-flex items-center rounded-full border border-white/60 px-3 py-1.5 text-xs font-medium text-foreground/70 shadow-[var(--shadow-soft)]">
+              {user.email}
+            </span>
+            <button
+              type="button"
+              onClick={() => signOut()}
+              aria-label="Sign out"
+              title="Sign out"
+              className="glass flex h-11 w-11 items-center justify-center rounded-full border border-white/60 shadow-[var(--shadow-soft)] transition-transform hover:scale-110 active:scale-95"
+            >
+              <LogOut className="h-5 w-5 text-foreground/70" />
+            </button>
+          </>
+        ) : (
+          <RouterLink
+            to="/auth"
+            aria-label="Sign in"
+            title="Sign in / Sign up"
+            className="glass flex h-11 items-center gap-1.5 rounded-full border border-white/60 px-4 shadow-[var(--shadow-soft)] transition-transform hover:scale-105 active:scale-95"
+          >
+            <LogIn className="h-4 w-4 text-foreground/70" />
+            <span className="text-xs font-semibold text-foreground/80">Sign in</span>
+          </RouterLink>
+        )}
         <button
           type="button"
           onClick={() => setShowTheme(true)}
