@@ -33,7 +33,11 @@ import {
   Lock,
   Link as LinkIcon,
   X,
+  LogIn,
+  LogOut,
 } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 type Mode = "school" | "strict" | "home";
 
