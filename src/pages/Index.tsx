@@ -35,9 +35,14 @@ import {
   X,
   LogIn,
   LogOut,
+  UserCircle,
+  Mail as MailIcon2,
 } from "lucide-react";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { z } from "zod";
 
 type Mode = "school" | "strict" | "home";
 
