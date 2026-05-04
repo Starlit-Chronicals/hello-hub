@@ -698,6 +698,15 @@ const Index = () => {
             </div>
 
             <div className="space-y-2">
+              {isAdmin && (
+                <RouterLink
+                  to="/admin"
+                  onClick={() => setShowAccount(false)}
+                  className="w-full rounded-2xl bg-[hsl(var(--pastel-mint))] px-4 py-2.5 text-sm font-semibold text-[hsl(150_50%_22%)] transition hover:opacity-90 inline-flex items-center justify-center gap-2"
+                >
+                  <Lock className="h-4 w-4" /> Open moderation
+                </RouterLink>
+              )}
               <button
                 onClick={() => { signOut(); setShowAccount(false); }}
                 className="w-full rounded-2xl border border-white/70 bg-white/40 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/60 inline-flex items-center justify-center gap-2"
