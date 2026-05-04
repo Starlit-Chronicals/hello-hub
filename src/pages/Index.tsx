@@ -125,6 +125,7 @@ type CustomLink = { id: string; name: string; url: string; color: string };
 const PROJECT_GITHUB = "https://github.com/"; // user can replace via custom link
 
 const Index = () => {
+  const { user, signOut } = useAuth();
   const [time, setTime] = useState(new Date());
   const [query, setQuery] = useState("");
 
