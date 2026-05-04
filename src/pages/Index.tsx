@@ -177,6 +177,29 @@ const Index = () => {
   // Modals
   const [showAdd, setShowAdd] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [accountBusy, setAccountBusy] = useState(false);
+
+  const updateEmail = async () => {
+    const parsed = z.string().trim().email("Enter a valid email").max(255).safeParse(newEmail);
+    if (!parsed.success) return toast.error(parsed.error.errors[0].message);
+    setAccountBusy(true);
+    const { error } = await supabase.auth.updateUser({ email: parsed.data });
+    setAccountBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Check both inboxes to confirm the change 💌");
+    setNewEmail("");
+  };
+
+  const signOutEverywhere = async () => {
+    setAccountBusy(true);
+    const { error } = await supabase.auth.signOut({ scope: "global" });
+    setAccountBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Signed out from all devices 🌙");
+    setShowAccount(false);
+  };
   const [newName, setNewName] = useState("");
   const [newUrl, setNewUrl] = useState("");
   const [newColor, setNewColor] = useState("lavender");
