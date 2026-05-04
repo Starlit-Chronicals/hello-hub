@@ -131,6 +131,7 @@ const PROJECT_GITHUB = "https://github.com/"; // user can replace via custom lin
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const [time, setTime] = useState(new Date());
   const [query, setQuery] = useState("");
 
