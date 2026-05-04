@@ -652,6 +652,68 @@ const Index = () => {
           </div>
         </div>
       )}
+      {/* Account modal */}
+      {showAccount && user && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+          <div className="glass w-full max-w-md rounded-3xl border border-white/70 p-6 shadow-[var(--shadow-glow)]">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <UserCircle className="h-5 w-5" /> Account
+              </h3>
+              <button onClick={() => setShowAccount(false)} className="rounded-full p-1 hover:bg-white/40" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mb-5 rounded-2xl bg-white/40 px-4 py-3 text-sm">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Signed in as</p>
+              <p className="font-medium break-all">{user.email}</p>
+            </div>
+
+            <div className="mb-5">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Update email
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="new@email.com"
+                  maxLength={255}
+                  className="flex-1 rounded-2xl border border-white/70 bg-white/60 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-[hsl(var(--ring))]"
+                />
+                <button
+                  onClick={updateEmail}
+                  disabled={accountBusy || !newEmail}
+                  className="rounded-2xl bg-[hsl(var(--pastel-lavender))] px-4 py-2 text-sm font-semibold text-[hsl(280_50%_25%)] disabled:opacity-50"
+                >
+                  Update
+                </button>
+              </div>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                You'll get a confirmation link at both addresses.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => { signOut(); setShowAccount(false); }}
+                className="w-full rounded-2xl border border-white/70 bg-white/40 px-4 py-2.5 text-sm font-semibold transition hover:bg-white/60 inline-flex items-center justify-center gap-2"
+              >
+                <LogOut className="h-4 w-4" /> Sign out (this device)
+              </button>
+              <button
+                onClick={signOutEverywhere}
+                disabled={accountBusy}
+                className="w-full rounded-2xl bg-[hsl(var(--pastel-rose))] px-4 py-2.5 text-sm font-semibold text-[hsl(340_50%_25%)] transition hover:opacity-90 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              >
+                <LogOut className="h-4 w-4" /> Sign out everywhere
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
